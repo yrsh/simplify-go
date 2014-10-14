@@ -24,10 +24,6 @@ type Point struct {
 	Y float64
 }
 
-type Points struct {
-	Points []Point
-}
-
 func getSqDist(p1, p2 Point) float64 {
 	dx := p1.X - p2.X
 	dy := p1.Y - p2.Y
