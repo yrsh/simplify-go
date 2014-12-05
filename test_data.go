@@ -1,6 +1,6 @@
-package data
+package simplifier
 
-func Get() ([][]float64, [][]float64, [][]float64) {
+func GetTestData() ([][]float64, [][]float64, [][]float64) {
 	//computed eith original Simplify.js
 	//tol 5, false
 	Simplified_5F := [][]float64{
