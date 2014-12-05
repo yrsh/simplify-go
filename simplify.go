@@ -1,4 +1,4 @@
-package simplify
+package simplifier
 
 //-statck------------------------------------------------
 type Stack []int
@@ -19,41 +19,36 @@ func (s *Stack) Pop() int {
 
 //-------------------------------------------------------
 
-type Point struct {
-	X float64
-	Y float64
-}
-
-func getSqDist(p1, p2 Point) float64 {
-	dx := p1.X - p2.X
-	dy := p1.Y - p2.Y
+func getSqDist(p1, p2 []float64) float64 {
+	dx := p1[0] - p2[0]
+	dy := p1[1] - p2[1]
 	return dx*dx + dy*dy
 }
 
-func getSqSegDist(p, p1, p2 Point) float64 {
-	x := p1.X
-	y := p1.Y
-	dx := p2.X - x
-	dy := p2.Y - y
+func getSqSegDist(p, p1, p2 []float64) float64 {
+	x := p1[0]
+	y := p1[1]
+	dx := p2[0] - x
+	dy := p2[1] - y
 	if dx != 0 || dy != 0 {
-		t := ((p.X-x)*dx + (p.Y-y)*dy) / (dx*dx + dy*dy)
+		t := ((p[0]-x)*dx + (p[1]-y)*dy) / (dx*dx + dy*dy)
 		if t > 1 {
-			x = p2.X
-			y = p2.Y
+			x = p2[0]
+			y = p2[1]
 		} else if t > 0 {
 			x += dx * t
 			y += dy * t
 		}
 	}
-	dx = p.X - x
-	dy = p.Y - y
+	dx = p[0] - x
+	dy = p[1] - y
 	return dx*dx + dy*dy
 }
 
-func simplifyRadialDist(points []Point, sqTolerance float64) []Point {
+func simplifyRadialDist(points [][]float64, sqTolerance float64) [][]float64 {
 	prevPoint := points[0]
-	newPoints := []Point{prevPoint}
-	var point Point
+	newPoints := [][]float64{prevPoint}
+	var point []float64
 	for i := 1; i < len(points); i++ {
 		point = points[i]
 		if getSqDist(point, prevPoint) > sqTolerance {
@@ -61,19 +56,20 @@ func simplifyRadialDist(points []Point, sqTolerance float64) []Point {
 			prevPoint = point
 		}
 	}
-	if prevPoint != point {
+	if !ComparePoints(prevPoint, point) {
 		newPoints = append(newPoints, point)
 	}
+
 	return newPoints
 }
 
-func simplifyDouglasPeucker(points []Point, sqTolerance float64) []Point {
+func simplifyDouglasPeucker(points [][]float64, sqTolerance float64) [][]float64 {
 	var l = len(points)
 	markers := make([]int, l)
 	first := 0
 	last := l - 1
 	var stack Stack
-	var newPoints []Point
+	var newPoints [][]float64
 	i, index := 0, 0
 	maxSqDist, sqDist := float64(0), float64(0)
 	markers[first], markers[last] = 1, 1
@@ -117,12 +113,12 @@ func checkArrIndex(arr []int, index int) bool {
 	}
 }
 
-func Simplify(points []Point, tolerance float64, highestQuality bool) []Point {
+func Simplify(points [][]float64, tolerance float64, highestQuality bool) [][]float64 {
 	if len(points) <= 1 {
 		return points
 	}
 	sqTolerance := tolerance * tolerance
-	var _points []Point
+	var _points [][]float64
 	if highestQuality {
 		_points = points
 	} else {
@@ -130,4 +126,26 @@ func Simplify(points []Point, tolerance float64, highestQuality bool) []Point {
 	}
 	_points = simplifyDouglasPeucker(_points, sqTolerance)
 	return _points
+}
+
+//-------------------------------
+func CompareSlices(p1, p2 [][]float64) bool {
+	if len(p1) == len(p2) {
+		for i := range p1 {
+			if !ComparePoints(p1[i], p2[i]) {
+				return false
+			}
+		}
+		return true
+	} else {
+		return false
+	}
+}
+
+func ComparePoints(p1, p2 []float64) bool {
+	if p1[0] == p2[0] && p1[1] == p2[1] {
+		return true
+	} else {
+		return false
+	}
 }
