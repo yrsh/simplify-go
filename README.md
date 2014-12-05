@@ -10,4 +10,4 @@ go get 'github.com/yrsh/simplify-go'
 
 Running test
 ------------
-cd to test_go, get the simplifier and run main.go
+go test
